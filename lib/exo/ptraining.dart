@@ -9,6 +9,8 @@ import '../data/exercise.dart';
 
 import './ptime.dart';
 
+import 'package:draw_graph/draw_graph.dart';
+
 class PageTraining extends StatelessWidget {
 
 	List<Exercice> exercice;
@@ -63,6 +65,7 @@ class _SPageTrainingState extends State<SPageTraining> {
 
 		final buttonTime = TextButton(
 			onPressed: () {
+
 				
 				Navigator.push(
 					context,
@@ -70,7 +73,18 @@ class _SPageTrainingState extends State<SPageTraining> {
 				)..then((value) {
 					print(value);
 
-					if (value == 0) {
+					if (value >= 0) {
+						if (cExo.perf == TypePerf.nb_rep_pdc) {
+							cExo.valuePerf.add([v1.text, 0, cSerieTraining + 1, cInfo.serie, value]);
+						} else if (cExo.perf == TypePerf.nb_rep_weights) {
+							print("ui !!");
+
+							int i = cExo.valuePerf.length;
+							cExo.valuePerf.add([int.parse(v1.text), int.parse(v2.text), 0, cSerieTraining + 1, cInfo.serie, value]);
+
+							print(cExo.valuePerf[i]);
+						}
+
 						cSerieTraining++;
 						if (cSerieTraining == cInfo.serie) {
 							cSerieTraining = 0;
@@ -135,8 +149,10 @@ class _SPageTrainingState extends State<SPageTraining> {
 			);
 		} else if (cExo.perf == TypePerf.nb_rep_weights) {
 			if (cExo.valuePerf.length != 0) {
-				v1.text = cExo.valuePerf[0][0].toString();
-				v2.text = cExo.valuePerf[0][1].toString();
+				int fi = cExo.valuePerf.length - 1;
+
+				v1.text = cExo.valuePerf[fi][0].toString();
+				v2.text = cExo.valuePerf[fi][1].toString();
 			} else {
 				v1.text = "";
 				v2.text = "";
@@ -258,15 +274,17 @@ class _SPageTrainingState extends State<SPageTraining> {
 								} else {
 								}
 
-								return Row(
-									children: <Widget> [
-										Text(ui[startI].toString()),
-										Spacer(),
-										Text(cPerf),
-										Spacer(),
-										Text(ui[startI + 1].toString() + "/" + ui[startI + 2].toString()),
-										Spacer(),
-										Text(ui[startI + 3].toString())
+								return Table(
+									defaultColumnWidth: IntrinsicColumnWidth(),
+									children: [
+										TableRow(
+											children: <Widget> [
+												Text(ui[startI].toString()),
+												Text(cPerf),
+												Text(ui[startI + 1].toString() + "/" + ui[startI + 2].toString()),
+												Text(ui[startI + 3].toString())
+											]
+										),
 									]
 								);
 							},

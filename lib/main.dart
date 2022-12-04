@@ -7,6 +7,8 @@ import 'data/exercise.dart';
 
 import 'exo/ptraining.dart';
 
+import 'data/save.dart';
+
 void main() {
 	runApp(const MyApp());
 }
@@ -37,7 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 	
-	List<Exercice> m_exercice = [
+	/** List<Exercice> m_exercice = [
 		Exercice(name: "Bench press", perf: TypePerf.nb_rep_weights, valuePerf: [
 			[12, 25, 0, 1, 4, 90],
 			[13, 25, 0, 1, 4, 90],
@@ -93,10 +95,13 @@ class _MyHomePageState extends State<MyHomePage> {
 					InfoExercice(),
 				]
 			)
-	];
+	]; **/
 
 
+	DataUser data = DataUser();
 	List<int> m_selectedTraining = [];
+
+	bool ui = false;
 
 
 	@override
@@ -127,67 +132,78 @@ class _MyHomePageState extends State<MyHomePage> {
 				  	),
 				]
 			),
-			body: (m_training.length == 0) ?
-				Center(
-					child: Text(
-						"You have no training plan, you can add one",
-						textAlign: TextAlign.center,
-						style: TextStyle(fontSize: 18),
-					)
-				)
-			: ListView.builder(
-				itemCount: m_training.length,
-				itemBuilder: (context, index) {
-					String subtitle = "";
-
-					for (int i = 0; i < m_training[index].exercice.length - 1; ++i) {
-						subtitle += m_exercice[m_training[index].exercice[i]].name + ", ";
+			body: FutureBuilder(
+				future: data.getData(),
+				builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+					if (snapshot.hasError) {
+						print("error: ${snapshot.error}");
+					}
+					
+					if (snapshot.hasError || data.m_training.length == 0) {
+						return Center(
+							child: Text(
+								"You have no training plan, you can add one",
+								textAlign: TextAlign.center,
+								style: TextStyle(fontSize: 18),
+							)
+						);
 					}
 
-					subtitle += m_exercice[
-						m_training[index].exercice[m_training[index].exercice.length - 1]
-					].name;
+					return ListView.builder(
+						itemCount: data.m_training.length,
+						itemBuilder: (context, index) {
+							String subtitle = "";
 
-					return GestureDetector(
-						onLongPress: () {
-							if (m_selectedTraining.indexOf(index) == -1) {
-								m_selectedTraining.add(index);
-							} else {
-								m_selectedTraining.remove(index);
+							for (int i = 0; i < data.m_training[index].exercice.length - 1; ++i) {
+								subtitle += data.m_exercice[data.m_training[index].exercice[i]].name + ", ";
 							}
 
-							setState(() {});
-						},
-						onTap: (){
-							if (m_selectedTraining.length != 0) {
-								if (m_selectedTraining.indexOf(index) == -1) {
-									m_selectedTraining.add(index);
-								} else {
-									m_selectedTraining.remove(index);
-								}
-							
-								setState(() {});
-							} else {
-						runApp(PageTraining(training: m_training[index], exercice: m_exercice)); 
-							}
+							subtitle += data.m_exercice[
+								data.m_training[index].exercice[data.m_training[index].exercice.length - 1]
+							].name;
 
-							print(index);
-						},
-						child: Opacity(
-							opacity: m_selectedTraining.indexOf(index) == -1 ? 1 : 0.5,
-							child: Card(
-								elevation: 6,
-								margin: const EdgeInsets.all(10),
-								child: ListTile(
-									leading: CircleAvatar(
-										backgroundColor: Colors.blue,
-										child: const Icon(Icons.sports_martial_arts),
-									),
-									title: Text(m_training[index].name),
-									subtitle: Text(subtitle),
+							return GestureDetector(
+								onLongPress: () {
+									if (m_selectedTraining.indexOf(index) == -1) {
+										m_selectedTraining.add(index);
+									} else {
+										m_selectedTraining.remove(index);
+									}
+
+									setState(() {});
+								},
+								onTap: (){
+									if (m_selectedTraining.length != 0) {
+										if (m_selectedTraining.indexOf(index) == -1) {
+											m_selectedTraining.add(index);
+										} else {
+											m_selectedTraining.remove(index);
+										}
+									
+										setState(() {});
+									} else {
+								runApp(PageTraining(training: data.m_training[index], exercice: data.m_exercice)); 
+									}
+
+									print(index);
+								},
+								child: Opacity(
+									opacity: m_selectedTraining.indexOf(index) == -1 ? 1 : 0.5,
+									child: Card(
+										elevation: 6,
+										margin: const EdgeInsets.all(10),
+										child: ListTile(
+											leading: CircleAvatar(
+												backgroundColor: Colors.blue,
+												child: const Icon(Icons.sports_martial_arts),
+											),
+											title: Text(data.m_training[index].name),
+											subtitle: Text(subtitle),
+										)
+									)
 								)
-							)
-						)
+							);
+						}
 					);
 				}
 			),

@@ -111,7 +111,7 @@ class _PTimeState extends State<PTime> {
 							),
 						),
 						onPressed: () {
-							Navigator.of(context).pop(0);
+							Navigator.of(context).pop(cTime);
 						},
 
 						style: ButtonStyle(

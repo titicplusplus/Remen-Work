@@ -39,6 +39,7 @@ dependencies:
   shared_preferences: ^2.0.15
   timer_builder: ^2.0.0
   vibration: ^1.7.6
+  draw_graph: ^1.0.0
 
 dev_dependencies:
   flutter_test:
